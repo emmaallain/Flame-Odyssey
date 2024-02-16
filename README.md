@@ -1,4 +1,4 @@
-# Flame Odyssey
+# 🔥Flame Odyssey🔥
 
 Welcome to Flame Odyssey! 
 
