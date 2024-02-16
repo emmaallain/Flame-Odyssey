@@ -3,7 +3,9 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { AdvancedDynamicTexture, StackPanel, Button, TextBlock, Rectangle, Control, Image } from "@babylonjs/gui";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, FreeCamera, LightBlock, GetEnvironmentBRDFTexture, Color4 } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, FreeCamera, LightBlock, GetEnvironmentBRDFTexture, Color4,Matrix, Color3,Quaternion, StandardMaterial, ShadowGenerator, PointLight } from "@babylonjs/core";
+import { Environnement } from "./environnement";
+import { Player } from "./characterController";
 
 //enum for states
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
@@ -16,10 +18,10 @@ class App {
     private engine: Engine;
     private gamescene: Scene;
     private cutScene: Scene;
-
-
-    //Scene - related
     private state: number = 0;
+    private environnement: Environnement;
+    public assets;
+    private player : Player;
 
     constructor() {
         // create the canvas html element and attach it to the webpage
@@ -219,6 +221,87 @@ class App {
             //--CREATE SCENE--
             let scene = new Scene(this.engine);
             this.gamescene = scene;
+
+            //--CREATE ENVIRONMENT--
+            const environnement = new Environnement(scene);
+            this.environnement = environnement; //class variable for App
+            await this.environnement.load(); //environment
+            await this.loadCharacterAssets(scene);
+    
+        }
+
+        private async loadCharacterAssets(scene){
+            //we're setting up the character mesh system.
+            async function loadCharacter(){
+                //collision mesh
+                const outer = MeshBuilder.CreateBox("outer", { width: 2, depth: 1, height: 3 }, scene);
+                outer.isVisible = false;
+                outer.isPickable = false;
+                outer.checkCollisions = true;
+
+                //move origin of box collider to the bottom of the mesh (to match imported player mesh)
+                outer.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0));
+
+                //for collisions
+                outer.ellipsoid = new Vector3(1, 1.5, 1);
+                outer.ellipsoidOffset = new Vector3(0, 1.5, 0);
+
+                outer.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
+                
+                //Création de la moustache du perso
+                var box = MeshBuilder.CreateBox("Small1", { width: 0.5, depth: 0.5, height: 0.25, faceColors: [new Color4(0, 0, 0, 1), new Color4(0, 0, 0, 1), new Color4(0, 0, 0, 1), new Color4(0, 0, 0, 1), new Color4(0, 0, 0, 1), new Color4(0, 0, 0, 1)] }, scene);
+                box.position.y = 1.5;
+                box.position.z = 1;
+                //création du corps 
+                var body = Mesh.CreateCylinder("body", 3, 2, 2, 0, 0, scene);
+                var bodymtl = new StandardMaterial("red", scene);
+                bodymtl.diffuseColor = new Color3(0.8, 0.5, 0.5); //couleur du body du personnage
+                body.material = bodymtl;
+                body.isPickable = false;
+                body.bakeTransformIntoVertices(Matrix.Translation(0, 1.5, 0)); // simulates the imported mesh's origin
+
+                //parent the meshes
+                box.parent = body;
+                body.parent = outer;
+
+                return {
+                    mesh: outer as Mesh
+                }
+            }
+
+            return loadCharacter().then((assets) => {
+                this.assets = assets;
+              });
+        }
+
+        private async initializeGameAsync(scene): Promise<void> {
+            //temporary light to light the entire scene
+            var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        
+            const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
+            light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
+            light.intensity = 35;
+            light.radius = 1;
+        
+            const shadowGenerator = new ShadowGenerator(1024, light);
+            shadowGenerator.darkness = 0.4;
+        
+            //Create the player
+            this.player = new Player(this.assets, scene, shadowGenerator); //dont have inputs yet so we dont need to pass it in
+        }private async _initializeGameAsync(scene): Promise<void> {
+            //temporary light to light the entire scene
+            var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        
+            const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
+            light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
+            light.intensity = 35;
+            light.radius = 1;
+        
+            const shadowGenerator = new ShadowGenerator(1024, light);
+            shadowGenerator.darkness = 0.4;
+        
+            //Create the player
+            this.player = new Player(this.assets, scene, shadowGenerator); //dont have inputs yet so we dont need to pass it in
         }
 
         private async goToGame(){
@@ -250,11 +333,17 @@ class App {
                 this.goToLose();
                 scene.detachControl(); //observables disabled
             });
-        
-            //temporary scene objects
-           // var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 0, 0), scene);
-            var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 0.5 }, scene);
 
+            //primitive character and setting
+            await this._initializeGameAsync(scene);
+
+            //--WHEN SCENE FINISHED LOADING--
+            await scene.whenReadyAsync();
+            scene.getMeshByName("outer").position = new Vector3(0, 3, 0);
+            //temporary scene objects
+           //var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 0, 0), scene);
+            //var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 0.5 }, scene);
+            
             //get rid of start scene, switch to gamescene and change states
             this.scene.dispose();
             this.state = State.GAME;
