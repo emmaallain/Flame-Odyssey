@@ -187,7 +187,7 @@ export const createGame = async function(){ //async
 /***********************************SKYBOX*********************************/
 
 
-    new PhotoDome("sky", "img/blueSky.jpg", { resolution: 32, size: 700 }, scene);
+    new PhotoDome("sky", "img/blueSky.jpg", { resolution: 32, size: 10000 }, scene);
 
 	    
         // Fog
@@ -262,21 +262,21 @@ export const createGame = async function(){ //async
         /**************************************LIGNE D'ARRIVEE******************************************/
         
         const end = MeshBuilder.CreateBox("box", {width: 400,height: 10 ,depth: 15,}, scene);
-        end.position = new Vector3(0,3,300);
+        end.position = new Vector3(0,3,10000);
 
    
     /*************************COMPTEUR*************/
 
     let seeds = [];
-    for (let i=0; i<20; i++){
+    for (let i=0; i<150; i++){
         var rn1 = randomNumber(-200,200);
-        var rn2 = randomNumber(-200,200);
+        var rn2 = randomNumber(-3000,3000);
         var seed1 = Mesh.CreateSphere("seed", 3, 10, scene);
+        seed1.scaling.setAll(1);
         seed1.position = new Vector3(rn1, 5, rn2);
 
         seeds.push(seed1);
    
-    
     }
 
 
@@ -286,7 +286,7 @@ for (let i=0; i<40;i++){
         const t = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
         //t.position = new BABYLON.Vector3(-200+20*j, 15, -400+20*i);
         t.position = new Vector3(-200+20*j, 15, -400+20*i);
-        const t1 = QuickTreeGenerator(50, 35, 15, woodMaterial, fireMaterial, scene);
+        const t1 = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
         //t1.position = new BABYLON.Vector3(-200, 15, -400+20*j*i);
         t1.position = new Vector3(-200, 15, -400+20*j*i);
     }
@@ -305,37 +305,26 @@ for (let i=0; i<40;i++){
     }
 }
 
-const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, end){ //async
+const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, barriers, end){ //async
 
 
     
     /********************************************************************************************************/
     SceneLoader.ImportMesh("", "models/", "player.glb", scene, function (newMeshes, particleSystems, skeletons, animationGroups) {
-        //var character = newMeshes[0];
         const character: AbstractMesh = newMeshes[0];
-
-        
         character.position = new Vector3(9, 0, -300);
-        
         character.scaling.scaleInPlace(2);
-        
         camera.target = character.position;
-        //TODO : FIX THIS
-        //character.applyGravity = true;
         character.checkCollisions = true;
-        // TODO : FIX THIS
-        //character.minZ = 0.45; 
+
 
 
     
         const ground = MeshBuilder.CreateGround("ground", { width: 6000, height: 10000 }, scene);
-        ground.rotation = new Vector3(5, 0, 0);
-        ground.position = new Vector3(0, 3, 400);
 
         const grassTexture = new Texture("img/grass.jpg", scene);
         const groundMaterial = new StandardMaterial("groundMaterial", scene);
-        //groundMaterial.diffuseTexture = grassTexture;
-        groundMaterial.diffuseColor = new Color3(0, 1, 0);
+        groundMaterial.diffuseTexture = grassTexture;
         ground.material = groundMaterial; // Assign the grass material to the ground
         ground.checkCollisions = true;
 
@@ -373,11 +362,11 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, end)
     
             var keydown = false;
             if (inputMap["rightArrow"]) {
-                character.position.x+=0.25;
+                character.position.x+=0.35;
                 keydown = true;
             }
             if (inputMap["leftArrow"]) {
-                character.position.x-=0.25;
+                character.position.x-=0.35;
                 keydown = true;
             }
         });
@@ -385,15 +374,14 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, end)
             scene.onBeforeRenderObservable.add(() => {
                 scene.registerBeforeRender(function () {
                     if (end.intersectsMesh(character, false)) { 
-                        
-                        
+                    
                         character.position = new Vector3(9, 0, -300);     
                     }
                     // if instersects with mesh
                     // TODO : deduct points en fonction de l'objet
                     for (var i=0; i<meshes.length; i++){
                             if (meshes[i].intersectsMesh(character, false)) {
-                                character.position = new Vector3(9, 0, -300);
+                                //character.position = new Vector3(9, 0, -300);
                                // TODO : add a point
                                 
                                 for (var j=0; j<meshes.length; j++){
@@ -406,19 +394,29 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, end)
                     // TODO : if you hit an obstacle, deduct points
                     for (var i=0; i<obstacles.length; i++){
                         if (obstacles[i].intersectsMesh(character, false)) {
-                            character.position = new Vector3(9, 0, -300);
+                            //character.position = new Vector3(9, 0, -300);
                         }
-                }
+                    }
 
+                    // TODO : if you hit a seed, add points but adapt selon l'objet
                         for (var i=0; i<seeds.length; i++){
                             if (seeds[i].intersectsMesh(character, false)) {
                                 seeds[i].dispose();
-                                //ajtPoints(1);
-                                //button.textContent = cpt;
+                                App.addPoints(1);
                                 seeds.splice(i,1);
                                 
                             }
                         }
+
+                        // BARRIERS //
+                        for (var j=0; j<barriers.length; j++){
+                            if (barriers[j].intersectsMesh(character, false)) {
+                                App.addPoints(-1);
+                                barriers[j].dispose();
+                                barriers.splice(j,1);
+                            }
+                        }
+
                         
                 });
             });
@@ -426,9 +424,50 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, end)
     });
 }
 
+let clonedMeshes = [];
+
+// Load and position barriers
+SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes) {
+    var originalMesh = meshes[0];
+    //var clonedMeshes = [];
+
+    for (var i = 0; i < 20; i++) {
+        var clonedMesh = originalMesh.clone("bad_" + i,null);
+        clonedMesh.scaling = new Vector3(10, 10, 10);
+        clonedMeshes.push(clonedMesh);
+    }
+
+    originalMesh.dispose();
+
+    var minX = -200;
+    var maxX = 200;
+    var minZ = -400;
+    var maxZ = 400;
+
+    function posRandom(meshes, minX, maxX, minZ, maxZ) {
+        meshes.forEach(function(mesh) {
+            var randomX = minX + Math.random() * (maxX - minX);
+            var randomZ = minZ + Math.random() * (maxZ - minZ);
+            mesh.position = new Vector3(randomZ, 0, randomX);
+        });
+    }
+
+    posRandom(clonedMeshes, minX, maxX, minZ, maxZ);
+
+    return clonedMeshes;
+});
+
+
+
+
+
+// Call createBarriers function only once during scene initialization
+
+
 
      /********************************************************************************************************************/
-     addCharacterWithMouvement(scene, meshes, obstacles, seeds, end);
+     addCharacterWithMouvement(scene, meshes, obstacles, seeds, clonedMeshes, end);
+
 
 return scene;
        

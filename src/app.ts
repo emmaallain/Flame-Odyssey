@@ -40,34 +40,17 @@ export default class App {
     public static engine: Engine;
     public static canvas: HTMLCanvasElement;
     public static state: number = 0;
+    public static score: number = 0;
     public assets;
+    private static points : HTMLElement = document.getElementById("score");
     private sceneMenu : Scene;
-    private sceneGame : Scene;
 
     constructor() {
         
         const canvas = createCanvas();
         App.engine = new Engine(canvas, true);
-        //this.engine = engine;
         this.scene = new Scene(App.engine);
-
         this.sceneMenu = createMenu();
-        //this.sceneGame = createGame();
-
-
-
-        // hide/show the Inspector
-        /*window.addEventListener("keydown", (ev) => {
-            // Shift+Ctrl+Alt+I
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.key === 'i') {
-                if (this.scene.debugLayer.isVisible()) {
-                    this.scene.debugLayer.hide();
-                } else {
-                    this.scene.debugLayer.show();
-                }
-            }
-        });*/
-
 
         this.main();
     }
@@ -102,29 +85,13 @@ export default class App {
     }
         )};
 
-    //set up the canvas
-    private createCanvas(): HTMLCanvasElement {
-        //Commented out for development
-        document.documentElement.style["overflow"] = "hidden";
-        document.documentElement.style.overflow = "hidden";
-        document.documentElement.style.width = "100%";
-        document.documentElement.style.height = "100%";
-        document.documentElement.style.margin = "0";
-        document.documentElement.style.padding = "0";
-        document.body.style.overflow = "hidden";
-        document.body.style.width = "100%";
-        document.body.style.height = "100%";
-        document.body.style.margin = "0";
-        document.body.style.padding = "0";
+        //// POINTS /////
 
-        //create the canvas html element and attach it to the webpage
-        App.canvas = document.createElement("canvas");
-        App.canvas.style.width = "100%";
-        App.canvas.style.height = "100%";
-        App.canvas.style.color= 
-        App.canvas.id = "gameCanvas";
-        document.body.appendChild(App.canvas);
-        return App.canvas;
+
+    public static addPoints(nb){
+        App.score += nb;
+        this.points.innerText = "Points : " + App.score;
+
     }
 
 }
