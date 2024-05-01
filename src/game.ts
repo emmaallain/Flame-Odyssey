@@ -1,4 +1,4 @@
-import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PhotoDome, Scene, SceneLoader, StandardMaterial, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
+import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PhotoDome, PhysicsImpostor, Scene, SceneLoader, StandardMaterial, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
 import { createBabylonSetup } from "./babylonSetup";
 import * as GUI from "@babylonjs/gui";
 import { FireMaterial } from '@babylonjs/materials';
@@ -305,7 +305,39 @@ for (let i=0; i<40;i+=4){
     }
 }
 
+///// QUIZ BOXES ////////////////////////
 
+const createQuizBoxes = function(scene) {
+    const numberOfBoxes = 10; // Adjust as needed
+    const spacing = 300; // Adjust as needed
+    const minZ = 220; // Minimum Z-coordinate
+    const maxZ = 600; // Maximum Z-coordinate
+
+    const quizBoxes = [];
+
+    // Create little boxes with randomized positions along a line
+    for (let i = 0; i < numberOfBoxes; i++) {
+        // Generate a random Z-coordinate for each box
+        const randomZ = Math.random() * (maxZ - minZ) + minZ;
+
+        // Calculate the position based on the randomized Z-coordinate
+        const position = new Vector3(-100, 0, randomZ + i * spacing);
+
+        // Create and position the box
+        const box = MeshBuilder.CreateBox(`quizBox${i}`, { size: 10 }, scene);
+        box.position = position;
+        quizBoxes.push(box);
+    }
+
+    return quizBoxes;
+};
+
+// Call the function to create quiz boxes
+const quizBoxes = createQuizBoxes(scene);
+
+
+
+////////////////////////////////////////
 
 
 ////////////////////////////////////////////
@@ -418,9 +450,8 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
                     inputMap["rightArrow"] = false;
                 }
             }));
-    
-            
-        
+
+
        
         const run = scene.getAnimationGroupByName("RunInPlace");
         const movement = scene.onBeforeRenderObservable.add(() => {
