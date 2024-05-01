@@ -137,7 +137,7 @@ export const createGame = async function(){ //async
 
 
         var fireMaterial = new StandardMaterial("fontainSculptur2", scene);
-        let obstacles = [];
+        /*let obstacles = [];
         
         for (var j=0; j<15; j++){
             var r = randomNumber(-300,250);
@@ -150,7 +150,7 @@ export const createGame = async function(){ //async
             f.position = new Vector3(r2,5,r+100);
 
             obstacles.push(f);
-        }
+        }*/
 
 
         /****************************************************************************************************************************************************/
@@ -281,8 +281,8 @@ export const createGame = async function(){ //async
 
 
 //à gauche
-for (let i=0; i<40;i++){
-    for (let j=0; j<7;j++){
+for (let i=0; i<40;i+=4){
+    for (let j=0; j<2;j++){
         const t = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
         //t.position = new BABYLON.Vector3(-200+20*j, 15, -400+20*i);
         t.position = new Vector3(-200+20*j, 15, -400+20*i);
@@ -293,7 +293,7 @@ for (let i=0; i<40;i++){
 }
 
 //à droite
-for (let i=0; i<40;i++){
+for (let i=0; i<40;i+=4){
     for (let j=0; j<2;j++){
         const t = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
         //t.position = new BABYLON.Vector3(200-20*j, 15, -400+20*i);
@@ -305,7 +305,74 @@ for (let i=0; i<40;i++){
     }
 }
 
-const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, barriers, end){ //async
+
+
+
+////////////////////////////////////////////
+
+/*const createRunningTrack = function(scene) {
+    // Define the positions of the trees along the Z-axis
+    const treePositions = [
+        -400, -200, -100, -50, 0, 50, 100, 200, 400 // Adjust these values based on your scene
+    ];
+
+    // Create lines between the trees
+    for (let i = 0; i < treePositions.length - 1; i++) {
+        //const startPos = new Vector3(0, 0, treePositions[i] - 200); // Start position of the line, extended along the Z-axis
+        const startPos = new Vector3(0,0,-300);
+        const endPos = new Vector3(0, 0, treePositions[i + 1] + 100); // End position of the line, extended along the Z-axis
+
+        // Calculate the X position for the line to be in the middle between the trees
+        const xPos = (startPos.z + endPos.z) / 2;
+
+        // Create the line between two trees
+        const line = MeshBuilder.CreateLines("line" + i, { points: [startPos, endPos] }, scene);
+
+        // Set the position of the line
+        line.position = new Vector3(xPos+40, 0.1, 0); // Adjust the Y position as needed
+
+        // Customize the appearance of the line here, such as color or material
+        // For example:
+        // line.color = new Color3(1, 1, 1); // White color
+    }
+};*/
+
+const createRunningTrack = function(scene) {
+    // Define the positions of the trees along the Z-axis
+    const treePositions = [
+        -400, -200, -100, -50, 0, 50, 100, 200, 400 // Adjust these values based on your scene
+    ];
+
+    // Create lines between the trees
+    for (let i = 0; i < treePositions.length - 1; i++) {
+        const startPos = new Vector3(treePositions[i], 0, -300); // Start position of the line, extended along the Z-axis
+        const endPos = new Vector3(treePositions[i + 1], 0, 300); // End position of the line, extended along the Z-axis
+
+        // Calculate the X position for the line to be in the middle between the trees
+        const xPos = (startPos.x + endPos.x) / 2;
+
+        // Create the line between two trees
+        const line = MeshBuilder.CreateLines("line" + i, { points: [startPos, endPos] }, scene);
+
+        // Set the position of the line
+        line.position = new Vector3(xPos + 200, 0.1, 0); // Adjust the Y position as needed
+
+        // Customize the appearance of the line here, such as color or material
+        // For example:
+        // line.color = new Color3(1, 1, 1); // White color
+    }
+};
+
+// Call the function to create the running track
+createRunningTrack(scene); // Assuming `scene` is already defined in your code
+
+
+
+
+
+    //////////////////////////////////////////
+
+const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){ //async
 
 
     
@@ -324,11 +391,12 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, barr
 
         const grassTexture = new Texture("img/grass.jpg", scene);
         const groundMaterial = new StandardMaterial("groundMaterial", scene);
-        groundMaterial.diffuseTexture = grassTexture;
+        //groundMaterial.diffuseTexture = grassTexture;
+        groundMaterial.diffuseColor  = new Color3(0.7, 0.2, 0.1);
         ground.material = groundMaterial; // Assign the grass material to the ground
         ground.checkCollisions = true;
 
-        
+   
         var inputMap = {}  
             scene.actionManager = new ActionManager(scene);
 
@@ -391,13 +459,6 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, barr
                             }
                     }
 
-                    // TODO : if you hit an obstacle, deduct points
-                    for (var i=0; i<obstacles.length; i++){
-                        if (obstacles[i].intersectsMesh(character, false)) {
-                            //character.position = new Vector3(9, 0, -300);
-                        }
-                    }
-
                     // TODO : if you hit a seed, add points but adapt selon l'objet
                         for (var i=0; i<seeds.length; i++){
                             if (seeds[i].intersectsMesh(character, false)) {
@@ -410,14 +471,12 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, barr
 
                         // BARRIERS //
                         for (var j=0; j<barriers.length; j++){
-                            if (barriers[j].intersectsMesh(character, false)) {
+                            if (barriers[j].getChildMeshes()[0].intersectsMesh(character, false)) {
                                 App.addPoints(-1);
-                                barriers[j].dispose();
+                                barriers[j].getChildMeshes()[0].isVisible = false;
                                 barriers.splice(j,1);
                             }
-                        }
-
-                        
+                        }  
                 });
             });
 
@@ -426,14 +485,31 @@ const addCharacterWithMouvement = function(scene, meshes, obstacles, seeds, barr
 
 let clonedMeshes = [];
 
+// Eiffel tower
+// Load and position the model "toureff.glb"
+SceneLoader.ImportMesh("", "models/toureff.glb", "", scene, function (newMeshes) {
+    const tower = newMeshes[0]; // Assuming there's only one mesh in the imported model
+    // Adjust the position of the tower
+    tower.position = new Vector3(150, 0, 800); // Adjust the Z position to place it further than the trees
+    // Make the tower large
+    tower.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
+});
+
+
 // Load and position barriers
 SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes) {
     var originalMesh = meshes[0];
     //var clonedMeshes = [];
 
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 100; i++) {
         var clonedMesh = originalMesh.clone("bad_" + i,null);
         clonedMesh.scaling = new Vector3(10, 10, 10);
+        clonedMesh.checkCollisions = true;
+
+        var rn1 = randomNumber(-200,200);
+        var rn2 = randomNumber(-3000,3000);
+        clonedMesh.position = new Vector3(rn1,0, rn2);
+
         clonedMeshes.push(clonedMesh);
     }
 
@@ -441,8 +517,10 @@ SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes
 
     var minX = -200;
     var maxX = 200;
-    var minZ = -400;
-    var maxZ = 400;
+    var minZ = -3000;
+    var maxZ = 3000;
+
+
 
     function posRandom(meshes, minX, maxX, minZ, maxZ) {
         meshes.forEach(function(mesh) {
@@ -452,7 +530,7 @@ SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes
         });
     }
 
-    posRandom(clonedMeshes, minX, maxX, minZ, maxZ);
+    //posRandom(clonedMeshes, minX, maxX, minZ, maxZ);
 
     return clonedMeshes;
 });
@@ -466,7 +544,7 @@ SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes
 
 
      /********************************************************************************************************************/
-     addCharacterWithMouvement(scene, meshes, obstacles, seeds, clonedMeshes, end);
+     addCharacterWithMouvement(scene, meshes, seeds, clonedMeshes, end);
 
 
 return scene;
