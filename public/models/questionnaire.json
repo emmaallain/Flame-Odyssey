@@ -1,0 +1,105 @@
+{
+    "1": {
+        "question": "Où se dérouleront les Jeux Olympiques d'été en 2024 ?",
+        "correct": "Paris",
+        "a": "Tokyo",
+        "b": "Londres"
+    },
+    "2": {
+        "question": "Quel est le symbole des Jeux Olympiques de Paris 2024 ?",
+        "correct": "La Tour Eiffel",
+        "a": "Le Louvre",
+        "b": "La Statue de la Liberté"
+    },
+    "3": {
+        "question": "Quelle nouvelle discipline fera son apparition aux Jeux Olympiques de 2024 ?",
+        "correct": "Toutes les réponses sont correctes",
+        "a": "Escalade",
+        "b": "Surf"
+    },
+    "4": {
+        "question": "Quelle est la durée prévue des Jeux Olympiques de 2024 ?",
+        "correct": "Deux semaines",
+        "a": "Une semaine",
+        "b": "Un mois"
+    }, 
+    "5": {
+        "question": "Quel célèbre stade accueillera les épreuves d'athlétisme aux Jeux Olympiques de 2024 ?",
+        "correct": "Stade de France",
+        "a": "Stade Allianz Arena",
+        "b": "Stade Maracanã"
+    }, 
+    "6": {
+        "question": "Combien de médailles d'or y a-t-il à gagner lors des Jeux Olympiques de 2024 ?",
+        "correct": "400",
+        "a": "200",
+        "b": "250"
+    },
+    "7": {
+        "question": "Quelle est la mascotte des Jeux Olympiques de Paris 2024 ?",
+        "correct": "Aimée",
+        "a": "Vinicius",
+        "b": "Parizo"
+    },
+    "8": {
+        "question": "Quel sport n'est pas au programme des Jeux Olympiques de 2024 ?",
+        "correct": "Rugby",
+        "a": "Basket-ball",
+        "b": "Tennis"
+    },
+    "9": {
+        "question": "Quel est le slogan officiel des Jeux Olympiques de Paris 2024 ?",
+        "correct": "Partageons la passion",
+        "a": "Faites-nous rêver",
+        "b": "Venez et voyez"
+    },
+    "10": {
+        "question": "Combien de disciplines sportives sont au programme des Jeux Olympiques de 2024 ?",
+        "correct": "33",
+        "a": "37",
+        "b": "29"
+    },
+    "11": {
+        "question": "Quel est le nom du projet visant à rendre les Jeux Olympiques de Paris 2024 plus écologiques ?",
+        "correct": "Green2024",
+        "a": "Paris Vert",
+        "b": "Objectif Carbone"
+    },
+    "12": {
+        "question": "Quelle ville accueillera les épreuves de surf lors des Jeux Olympiques de 2024 ?",
+        "correct": "Tahiti",
+        "a": "Marseille",
+        "b": "Biarritz"
+    },
+    "13": {
+        "question": "Quelle est la médaille la plus lourde des Jeux Olympiques de 2024 ?",
+        "correct": "Toutes les médailles ont le même poids",
+        "a": "Or",
+        "b": "Argent"
+    },
+    "14": {
+        "question": "Quel est le nom du programme visant à encourager la participation des jeunes aux Jeux Olympiques de Paris 2024 ?",
+        "correct": "Generation 2024",
+        "a": "Jeux en herbe",
+        "b": "Olympiades Jeunesse"
+    },
+    "15": {
+        "question": "Qui a été choisi comme président du Comité d'organisation des Jeux Olympiques de Paris 2024 ?",
+        "correct": "Tony Estanguet",
+        "a": "Pierre de Coubertin",
+        "b": "Jacques Rogge"
+    },
+    "16": {
+        "question": "En gymnastique artistique, quelle est la hauteur réglementaire de la poutre ?",
+        "correct": "10 centimètres",
+        "a": "10 mètres",
+        "b": "30 centimètres"
+    },
+    "17": {
+        "question": "Dans quelle épreuve de natation les nageurs doivent-ils nager dans quatre styles différents sur des distances spécifiques ?",
+        "correct": "Le relais 4x100m 4 nages",
+        "a": "Le relais 4x100m nage libre",
+        "b": "Cette épreuve n'existe pas. "
+    }
+
+}
