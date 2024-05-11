@@ -1,11 +1,8 @@
-import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PhotoDome, PhysicsImpostor, Scene, SceneLoader, StandardMaterial, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
-import { createBabylonSetup } from "./babylonSetup";
+import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, CubeTexture, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PBRMaterial, PhotoDome, PhysicsImpostor, Scene, SceneLoader, StandardMaterial, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
 import * as GUI from "@babylonjs/gui";
 import { FireMaterial } from '@babylonjs/materials';
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { SkyMaterial } from '@babylonjs/materials';
 import App from "./app";
 
 export const QuickTreeGenerator = function(sizeBranch, sizeTrunk, radius, trunkMaterial, leafMaterial, scene) {
@@ -308,22 +305,21 @@ for (let i=0; i<40;i+=4){
 ///// QUIZ BOXES ////////////////////////
 
 const createQuizBoxes = function(scene) {
-    const numberOfBoxes = 10; // Adjust as needed
-    const spacing = 300; // Adjust as needed
-    const minZ = 220; // Minimum Z-coordinate
-    const maxZ = 600; // Maximum Z-coordinate
+    const numberOfBoxes = 10; 
+    const spacing = 300; 
+    const minX = -100; 
+    const maxX = 100; 
+    const minZ = 220; 
+    const maxZ = 600; 
 
     const quizBoxes = [];
 
-    // Create little boxes with randomized positions along a line
     for (let i = 0; i < numberOfBoxes; i++) {
-        // Generate a random Z-coordinate for each box
+        const randomX = Math.random() * (maxX - minX) + minX;
         const randomZ = Math.random() * (maxZ - minZ) + minZ;
 
-        // Calculate the position based on the randomized Z-coordinate
-        const position = new Vector3(-100, 0, randomZ + i * spacing);
+        const position = new Vector3(randomX, 0, randomZ + i * spacing);
 
-        // Create and position the box
         const box = MeshBuilder.CreateBox(`quizBox${i}`, { size: 10 }, scene);
         box.position = position;
         quizBoxes.push(box);
@@ -332,7 +328,7 @@ const createQuizBoxes = function(scene) {
     return quizBoxes;
 };
 
-// Call the function to create quiz boxes
+
 const quizBoxes = createQuizBoxes(scene);
 
 
@@ -399,9 +395,6 @@ const createRunningTrack = function(scene) {
 createRunningTrack(scene); // Assuming `scene` is already defined in your code
 
 
-
-
-
     //////////////////////////////////////////
 
 const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){ //async
@@ -421,10 +414,10 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
     
         const ground = MeshBuilder.CreateGround("ground", { width: 6000, height: 10000 }, scene);
 
-        const grassTexture = new Texture("img/grass.jpg", scene);
+        const betonTexture = new Texture("img/beton.JPG", scene);
         const groundMaterial = new StandardMaterial("groundMaterial", scene);
-        //groundMaterial.diffuseTexture = grassTexture;
-        groundMaterial.diffuseColor  = new Color3(0.7, 0.2, 0.1);
+        groundMaterial.diffuseTexture = betonTexture;
+        //groundMaterial.diffuseColor  = new Color3(0.7, 0.2, 0.1);
         ground.material = groundMaterial; // Assign the grass material to the ground
         ground.checkCollisions = true;
 
@@ -524,6 +517,14 @@ SceneLoader.ImportMesh("", "models/toureff.glb", "", scene, function (newMeshes)
     tower.position = new Vector3(150, 0, 800); // Adjust the Z position to place it further than the trees
     // Make the tower large
     tower.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
+});
+
+SceneLoader.ImportMesh("", "models/question.fbx", "", scene, function (newMeshes) {
+    const question = newMeshes[0]; // Assuming there's only one mesh in the imported model
+    // Adjust the position of the tower
+    question.position = new Vector3(140, 0, 300); // Adjust the Z position to place it further than the trees
+    // Make the tower large
+    question.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
 });
 
 
