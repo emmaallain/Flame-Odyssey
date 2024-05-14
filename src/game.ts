@@ -1,4 +1,4 @@
-import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PhotoDome, PhysicsImpostor, Scene, SceneLoader, StandardMaterial, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
+import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PhotoDome, PhysicsImpostor, Scene, SceneLoader, StandardMaterial, TextureBlock, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
 import { createBabylonSetup } from "./babylonSetup";
 import * as GUI from "@babylonjs/gui";
 import { FireMaterial } from '@babylonjs/materials';
@@ -6,7 +6,10 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { SkyMaterial } from '@babylonjs/materials';
+import { AdvancedDynamicTexture,TextBlock , Button} from "@babylonjs/gui";
+
 import App from "./app";
+ 
 
 export const QuickTreeGenerator = function(sizeBranch, sizeTrunk, radius, trunkMaterial, leafMaterial, scene) {
 
@@ -21,6 +24,7 @@ export const QuickTreeGenerator = function(sizeBranch, sizeTrunk, radius, trunkM
     const map = [];
 
     const max = [];
+   
 
     for (let i = 0; i < numberOfPoints; i++) {
         const p = new Vector3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
@@ -115,7 +119,7 @@ export const createGame = async function(){ //async
 
         scene.gravity = new Vector3(0, -9.81, 0);
 
-        var camera : ArcRotateCamera = new ArcRotateCamera("camera1",0 , 0, 20 , new Vector3(9, 10, -400));
+        let camera : ArcRotateCamera = new ArcRotateCamera("camera1",0 , 0, 20 , new Vector3(9, 10, -400));
         scene.activeCamera = camera;
         scene.gravity = new Vector3(0, -9.81 / 60, 0);
         scene.collisionsEnabled = true;
@@ -136,12 +140,12 @@ export const createGame = async function(){ //async
 
 
 
-        var fireMaterial = new StandardMaterial("fontainSculptur2", scene);
+        let fireMaterial = new StandardMaterial("fontainSculptur2", scene);
         /*let obstacles = [];
         
-        for (var j=0; j<15; j++){
-            var r = randomNumber(-300,250);
-            var r2 = randomNumber(-200, 100);
+        for (let j=0; j<15; j++){
+            let r = randomNumber(-300,250);
+            let r2 = randomNumber(-200, 100);
             const f =  MeshBuilder.CreateBox("plane", {height:2, width: 2, depth: 1});
             f.scaling.x = 12;
             f.scaling.y = 14;
@@ -162,12 +166,12 @@ export const createGame = async function(){ //async
         woodTexture.ampScale = 50;
         woodMaterial.diffuseTexture = woodTexture;*/
 /*
-        var grassMaterial = new BABYLON.StandardMaterial("grassMat", scene);
-        var grassTexture = new BABYLON.GrassProceduralTexture("grassTex", 256, scene);
+        let grassMaterial = new BABYLON.StandardMaterial("grassMat", scene);
+        let grassTexture = new BABYLON.GrassProceduralTexture("grassTex", 256, scene);
         grassMaterial.ambientTexture = grassTexture;
 */
         // TODO : try to fix
-        /*var fireTexture = new FireMaterial("fire", scene);
+        /*let fireTexture = new FireMaterial("fire", scene);
         fireMaterial.diffuseTexture = fireTexture;
         fireMaterial.opacityTexture = fireTexture;*/
 
@@ -176,7 +180,7 @@ export const createGame = async function(){ //async
 
 
 
-        var fire = new FireMaterial("fire", scene);
+        let fire = new FireMaterial("fire", scene);
         fire.diffuseTexture = new Texture("textures/fire.png", scene);
         fire.distortionTexture = new Texture("textures/distortion.png", scene);
         fire.opacityTexture = new Texture("textures/candleopacity.png", scene);
@@ -203,8 +207,8 @@ export const createGame = async function(){ //async
     /**********************************************ARBRES***********************************************/
   
  
-    /*for (var i=0; i<60; i++){
-        var r = randomNumber(-450,450);
+    /*for (let i=0; i<60; i++){
+        let r = randomNumber(-450,450);
         const t = QuickTreeGenerator(80, 60, 15, woodMaterial, leafMaterial, scene);
         t.position = new Vector3(-r, 15, 20*i-5*r);
         const t1 = QuickTreeGenerator(80, 60, 15, woodMaterial, fire, scene);
@@ -223,7 +227,7 @@ export const createGame = async function(){ //async
 
   
 
-    var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+    let advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
             /*****timer*****/
 
@@ -269,9 +273,9 @@ export const createGame = async function(){ //async
 
     let seeds = [];
     for (let i=0; i<150; i++){
-        var rn1 = randomNumber(-200,200);
-        var rn2 = randomNumber(-3000,3000);
-        var seed1 = Mesh.CreateSphere("seed", 3, 10, scene);
+        let rn1 = randomNumber(-200,200);
+        let rn2 = randomNumber(-3000,3000);
+        let seed1 = Mesh.CreateSphere("seed", 3, 10, scene);
         seed1.scaling.setAll(1);
         seed1.position = new Vector3(rn1, 5, rn2);
 
@@ -404,10 +408,9 @@ createRunningTrack(scene); // Assuming `scene` is already defined in your code
 
     //////////////////////////////////////////
 
-const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){ //async
+const addCharacterWithMouvement = function(scene, meshes, seeds, barriers,quizBoxes, end){ //async
 
 
-    
     /********************************************************************************************************/
     SceneLoader.ImportMesh("", "models/", "player.glb", scene, function (newMeshes, particleSystems, skeletons, animationGroups) {
         const character: AbstractMesh = newMeshes[0];
@@ -415,6 +418,7 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
         character.scaling.scaleInPlace(2);
         camera.target = character.position;
         character.checkCollisions = true;
+        
 
 
 
@@ -429,7 +433,7 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
         ground.checkCollisions = true;
 
    
-        var inputMap = {}  
+        let inputMap = {}  
             scene.actionManager = new ActionManager(scene);
 
             // Register keydown and keyup events for left and right arrow keys
@@ -459,7 +463,7 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
             character.moveWithCollisions(character.forward.scaleInPlace(1.05));
             run.start(true, 1.6, run.from, run.to, false);
     
-            var keydown = false;
+            let keydown = false;
             if (inputMap["rightArrow"]) {
                 character.position.x+=0.35;
                 keydown = true;
@@ -471,6 +475,7 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
         });
 
             scene.onBeforeRenderObservable.add(() => {
+
                 scene.registerBeforeRender(function () {
                     if (end.intersectsMesh(character, false)) { 
                     
@@ -478,12 +483,12 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
                     }
                     // if instersects with mesh
                     // TODO : deduct points en fonction de l'objet
-                    for (var i=0; i<meshes.length; i++){
+                    for (let i=0; i<meshes.length; i++){
                             if (meshes[i].intersectsMesh(character, false)) {
                                 //character.position = new Vector3(9, 0, -300);
                                // TODO : add a point
                                 
-                                for (var j=0; j<meshes.length; j++){
+                                for (let j=0; j<meshes.length; j++){
                                     meshes[j].dispose(); // make the object disappear
                                     
                                 }
@@ -491,7 +496,7 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
                     }
 
                     // TODO : if you hit a seed, add points but adapt selon l'objet
-                        for (var i=0; i<seeds.length; i++){
+                        for (let i=0; i<seeds.length; i++){
                             if (seeds[i].intersectsMesh(character, false)) {
                                 seeds[i].dispose();
                                 App.addPoints(1);
@@ -501,13 +506,31 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers, end){
                         }
 
                         // BARRIERS //
-                        for (var j=0; j<barriers.length; j++){
+                        for (let j=0; j<barriers.length; j++){
                             if (barriers[j].getChildMeshes()[0].intersectsMesh(character, false)) {
                                 App.addPoints(-1);
                                 barriers[j].getChildMeshes()[0].isVisible = false;
                                 barriers.splice(j,1);
                             }
                         }  
+
+                        for(let j=0; j<quizBoxes.length ; j++){
+                            if (quizBoxes[j].intersectsMesh(character, false)) {
+                                                               
+                                camera.detachControl();
+                                scene.animationGroups.forEach((animationGroup) => {
+                                    animationGroup.pause();
+                                });
+                                scene.meshes.forEach((mesh) => {
+                                    mesh.freezeWorldMatrix();
+                                });
+                                                   //
+                                displayQuiz();
+                                quizBoxes[j].isVisible = false;
+                                quizBoxes.splice(j,1);
+                                
+                            }
+                        }
                 });
             });
 
@@ -529,16 +552,16 @@ SceneLoader.ImportMesh("", "models/toureff.glb", "", scene, function (newMeshes)
 
 // Load and position barriers
 SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes) {
-    var originalMesh = meshes[0];
-    //var clonedMeshes = [];
+    let originalMesh = meshes[0];
+    //let clonedMeshes = [];
 
-    for (var i = 0; i < 100; i++) {
-        var clonedMesh = originalMesh.clone("bad_" + i,null);
+    for (let i = 0; i < 100; i++) {
+        let clonedMesh = originalMesh.clone("bad_" + i,null);
         clonedMesh.scaling = new Vector3(10, 10, 10);
         clonedMesh.checkCollisions = true;
 
-        var rn1 = randomNumber(-200,200);
-        var rn2 = randomNumber(-3000,3000);
+        let rn1 = randomNumber(-200,200);
+        let rn2 = randomNumber(-3000,3000);
         clonedMesh.position = new Vector3(rn1,0, rn2);
 
         clonedMeshes.push(clonedMesh);
@@ -546,17 +569,17 @@ SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes
 
     originalMesh.dispose();
 
-    var minX = -200;
-    var maxX = 200;
-    var minZ = -3000;
-    var maxZ = 3000;
+    let minX = -200;
+    let maxX = 200;
+    let minZ = -3000;
+    let maxZ = 3000;
 
 
 
     function posRandom(meshes, minX, maxX, minZ, maxZ) {
         meshes.forEach(function(mesh) {
-            var randomX = minX + Math.random() * (maxX - minX);
-            var randomZ = minZ + Math.random() * (maxZ - minZ);
+            let randomX = minX + Math.random() * (maxX - minX);
+            let randomZ = minZ + Math.random() * (maxZ - minZ);
             mesh.position = new Vector3(randomZ, 0, randomX);
         });
     }
@@ -565,6 +588,113 @@ SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes
 
     return clonedMeshes;
 });
+
+async function displayQuiz() {
+    let advancedTexture : AdvancedDynamicTexture = AdvancedDynamicTexture.CreateFullscreenUI("popup", true, scene);
+    await advancedTexture.parseFromSnippetAsync("2T136X#8");
+    let textBlock=advancedTexture.getControlByName("question");
+    textBlock.isVisible=true;
+    let reponse1=advancedTexture.getControlByName("reponse1");
+    reponse1.isVisible=true;
+    let reponse2=advancedTexture.getControlByName("reponse2");
+    reponse2.isVisible=true;
+    let reponse3=advancedTexture.getControlByName("reponse3");
+    reponse3.isVisible=true;
+    let message=advancedTexture.getControlByName("message");
+    message.isVisible=false;
+    let reponseCorrect;
+
+    fetch('/models/questionnaire.json')
+  .then(response => response.json())
+  .then(data => {
+    // Analyser le JSON
+    const jsonData = data;
+    console.log(jsonData);
+    const randomQuestion=Math.floor(Math.random() * 17) + 1;
+    const quizzObject=jsonData[""+randomQuestion];
+    const question=quizzObject.question;
+    reponseCorrect=quizzObject.correct;
+    const reponseA=quizzObject.a;
+    const reponseB=quizzObject.b;
+
+    if (textBlock instanceof TextBlock) textBlock.text = question;
+    if(reponse1 instanceof Button) reponse1.textBlock.text= reponseCorrect;
+    if(reponse2 instanceof Button) reponse2.textBlock.text= reponseA;
+    if(reponse3 instanceof Button) reponse3.textBlock.text= reponseB;
+  })
+  .catch(error => {
+    console.error('Une erreur s\'est produite lors du chargement du fichier JSON :', error);
+  });
+
+  reponse1.onPointerDownObservable.add(() => {
+    enableButtons(reponse1,reponse2,reponse3);
+    if ((reponse1 instanceof Button) && (reponse1.textBlock.text==reponseCorrect)){
+        sentMessage(true,reponseCorrect,message,advancedTexture);
+    }else {
+        sentMessage(false,reponseCorrect,message,advancedTexture);
+    }
+
+   
+  });
+
+  reponse2.onPointerDownObservable.add(() => {
+    enableButtons(reponse1,reponse2,reponse3);
+    if ((reponse2 instanceof Button) && (reponse2.textBlock.text==reponseCorrect)){
+        sentMessage(true,reponseCorrect,message,advancedTexture);
+    }else {
+        sentMessage(false,reponseCorrect,message,advancedTexture);
+    }
+
+    
+  });
+
+  reponse3.onPointerDownObservable.add(() => {
+   enableButtons(reponse1,reponse2,reponse3);
+
+    if ( (reponse3 instanceof Button) && (reponse3.textBlock.text==reponseCorrect)){
+        sentMessage(true,reponseCorrect,message,advancedTexture);
+    }else {
+        sentMessage(false,reponseCorrect,message,advancedTexture);
+    }
+
+    
+  });
+
+
+}
+
+function sentMessage(boolean,reponseCorrecte,message,advancedTexture){
+    if(message instanceof TextBlock){
+        message.isVisible=true;
+        if(boolean==true){
+            message.text="Bravo vous avez trouvé la bonne réponse. Vous gagnez 5 points supplémentaires!"
+            message.color="green";
+            App.addPoints(5);
+            setTimeout(() => {
+                message.isVisible = false;
+                advancedTexture.dispose();
+            }, 7000);
+        }else{
+            message.text="Raté! La bonne réponse était "+ reponseCorrecte + ". Vous perdez 3 points.";
+            message.color="red";
+            App.addPoints(-3);
+            setTimeout(() => {
+                message.isVisible = false;
+                advancedTexture.dispose();
+            }, 7000);
+        }
+    }
+    
+
+}
+
+function enableButtons(button1,button2,button3){
+    if((button1 instanceof Button) && (button2 instanceof Button) && (button3 instanceof Button)){
+    button1.isEnabled=false;
+    button2.isEnabled=false;
+    button3.isEnabled=false;
+    }
+}
 
 
 
@@ -575,7 +705,7 @@ SceneLoader.ImportMesh("", "models/RoadBlockade.glb", "", scene, function(meshes
 
 
      /********************************************************************************************************************/
-     addCharacterWithMouvement(scene, meshes, seeds, clonedMeshes, end);
+     addCharacterWithMouvement(scene, meshes, seeds, clonedMeshes,quizBoxes, end);
 
 
 return scene;

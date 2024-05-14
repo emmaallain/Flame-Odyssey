@@ -30,6 +30,7 @@ function createCanvas(): HTMLCanvasElement {
     document.body.style.height = "100%";
     document.body.style.margin = "0";
     document.body.style.padding = "0";
+    document.getElementById("popup").style.visibility="hidden";
 
     // Create the canvas HTML element and attach it to the webpage
     const canvas = document.createElement("canvas");

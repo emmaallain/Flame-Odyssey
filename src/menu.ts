@@ -30,6 +30,7 @@ export const createMenu = function () {
 
         var advancedTexture : AdvancedDynamicTexture = AdvancedDynamicTexture.CreateFullscreenUI("firstMenu", true, scene);
         await advancedTexture.parseFromSnippetAsync("TNAKE1#48");
+        
 
         const menuScreen = advancedTexture.getControlByName("menuScreen");
         const playScreen = advancedTexture.getControlByName("HTPscreen");
@@ -66,6 +67,8 @@ export const createMenu = function () {
 
     }
     loadGUI();
+
+    
 
     return scene;
 
