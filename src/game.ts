@@ -506,9 +506,9 @@ SceneLoader.ImportMesh("", "models/toureff.glb", "", scene, function (newMeshes)
 SceneLoader.ImportMesh("", "models/louvre.glb", "", scene, function (newMeshes) {
     const louvre = newMeshes[0]; // Assuming there's only one mesh in the imported model
     // Adjust the position of the tower
-    louvre.position = new Vector3(150, 0, 1000); // Adjust the Z position to place it further than the trees
+    louvre.position = new Vector3(-180, -10, 1000); // Adjust the Z position to place it further than the trees
     // Make the tower large
-    louvre.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
+    louvre.scaling = new Vector3(30, 30, 30); // Adjust the scaling factor as needed
 });
 
 SceneLoader.ImportMesh("", "models/question.fbx", "", scene, function (newMeshes) {
