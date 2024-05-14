@@ -1,15 +1,14 @@
-import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PhotoDome, PhysicsImpostor, Scene, SceneLoader, StandardMaterial, TextureBlock, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
-import { createBabylonSetup } from "./babylonSetup";
+import { AbstractMesh, ActionManager, ArcRotateCamera, CreateSphere, CubeTexture, DirectionalLight, ExecuteCodeAction, HemisphericLight, Mesh, MeshBuilder, PBRMaterial, PhotoDome, PhysicsImpostor, Scene, SceneLoader, StandardMaterial, TextureBlock, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
 import * as GUI from "@babylonjs/gui";
+import { createBabylonSetup } from "./babylonSetup";
 import { FireMaterial } from '@babylonjs/materials';
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { AdvancedDynamicTexture,TextBlock , Button} from "@babylonjs/gui";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { SkyMaterial } from '@babylonjs/materials';
-import { AdvancedDynamicTexture,TextBlock , Button} from "@babylonjs/gui";
 
 import App from "./app";
- 
 
 export const QuickTreeGenerator = function(sizeBranch, sizeTrunk, radius, trunkMaterial, leafMaterial, scene) {
 
@@ -73,8 +72,10 @@ export const QuickTreeGenerator = function(sizeBranch, sizeTrunk, radius, trunkM
     leaves.convertToFlatShadedMesh();
 
     leaves.material = leafMaterial;
+    leaves.position.y = 5;
 
     const trunk = MeshBuilder.CreateCylinder("trunk", {height: sizeTrunk, diameterTop: radius-2<1?1:radius-2, diameterBottom: radius, tessellation: 10, subdivisions: 2});
+    trunk.position.y = sizeBranch / 2 - 20;
     trunk.checkCollisions = true;
 
     trunk.material = trunkMaterial;
@@ -268,6 +269,26 @@ export const createGame = async function(){ //async
         const end = MeshBuilder.CreateBox("box", {width: 400,height: 10 ,depth: 15,}, scene);
         end.position = new Vector3(0,3,10000);
 
+        /**********TROTTOIR*********/
+        // creer un long trottoir entre -230 et 230 pour x et -3000 et 3000 pour z
+        
+            // gauche
+            const trottoir = MeshBuilder.CreateBox("box", {width: 700,height: 5,depth: 10000,}, scene);
+            trottoir.position = new Vector3(-480, 5, 0);
+            const betonTexture = new Texture("img/beton.JPG", scene);
+            // ajouter de la texture beton au trottoir
+            const trottoirMaterial = new StandardMaterial("trottoirMaterial", scene);
+            trottoirMaterial.diffuseTexture = betonTexture;
+            trottoir.material = trottoirMaterial;
+
+            // droite
+            const trottoir2 = MeshBuilder.CreateBox("box", {width: 480,height: 5,depth: 10000,}, scene);
+            trottoir2.position = new Vector3(330, 5, 0);
+            // ajouter de la texture beton au trottoir
+            trottoirMaterial.diffuseTexture = betonTexture;
+            trottoir2.material = trottoirMaterial;
+        
+
    
     /*************************COMPTEUR*************/
 
@@ -284,15 +305,16 @@ export const createGame = async function(){ //async
     }
 
 
+
 //à gauche
 for (let i=0; i<40;i+=4){
     for (let j=0; j<2;j++){
         const t = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
         //t.position = new BABYLON.Vector3(-200+20*j, 15, -400+20*i);
-        t.position = new Vector3(-200+20*j, 15, -400+20*i);
+        t.position = new Vector3(-170+20*j, 15, -400+20*i);
         const t1 = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
         //t1.position = new BABYLON.Vector3(-200, 15, -400+20*j*i);
-        t1.position = new Vector3(-200, 15, -400+20*j*i);
+        t1.position = new Vector3(-170, 15, -400+20*j*i);
     }
 }
 
@@ -301,33 +323,32 @@ for (let i=0; i<40;i+=4){
     for (let j=0; j<2;j++){
         const t = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
         //t.position = new BABYLON.Vector3(200-20*j, 15, -400+20*i);
-        t.position = new Vector3(200-20*j, 15, -400+20*i);
+        t.position = new Vector3(120-20*j, 15, -400+20*i);
     
     const t1 = QuickTreeGenerator(50, 35, 15, woodMaterial, leafMaterial, scene);
     //t1.position = new BABYLON.Vector3(200, 15, -400+20*j*i);
-    t1.position = new Vector3(200, 15, -400+20*j*i);
+    t1.position = new Vector3(120, 15, -400+20*j*i);
     }
 }
 
 ///// QUIZ BOXES ////////////////////////
 
 const createQuizBoxes = function(scene) {
-    const numberOfBoxes = 10; // Adjust as needed
-    const spacing = 300; // Adjust as needed
-    const minZ = 220; // Minimum Z-coordinate
-    const maxZ = 600; // Maximum Z-coordinate
+    const numberOfBoxes = 10; 
+    const spacing = 300; 
+    const minX = -100; 
+    const maxX = 100; 
+    const minZ = 220; 
+    const maxZ = 600; 
 
     const quizBoxes = [];
 
-    // Create little boxes with randomized positions along a line
     for (let i = 0; i < numberOfBoxes; i++) {
-        // Generate a random Z-coordinate for each box
+        const randomX = Math.random() * (maxX - minX) + minX;
         const randomZ = Math.random() * (maxZ - minZ) + minZ;
 
-        // Calculate the position based on the randomized Z-coordinate
-        const position = new Vector3(-100, 0, randomZ + i * spacing);
+        const position = new Vector3(randomX, 0, randomZ + i * spacing);
 
-        // Create and position the box
         const box = MeshBuilder.CreateBox(`quizBox${i}`, { size: 10 }, scene);
         box.position = position;
         quizBoxes.push(box);
@@ -336,74 +357,8 @@ const createQuizBoxes = function(scene) {
     return quizBoxes;
 };
 
-// Call the function to create quiz boxes
+
 const quizBoxes = createQuizBoxes(scene);
-
-
-
-////////////////////////////////////////
-
-
-////////////////////////////////////////////
-
-/*const createRunningTrack = function(scene) {
-    // Define the positions of the trees along the Z-axis
-    const treePositions = [
-        -400, -200, -100, -50, 0, 50, 100, 200, 400 // Adjust these values based on your scene
-    ];
-
-    // Create lines between the trees
-    for (let i = 0; i < treePositions.length - 1; i++) {
-        //const startPos = new Vector3(0, 0, treePositions[i] - 200); // Start position of the line, extended along the Z-axis
-        const startPos = new Vector3(0,0,-300);
-        const endPos = new Vector3(0, 0, treePositions[i + 1] + 100); // End position of the line, extended along the Z-axis
-
-        // Calculate the X position for the line to be in the middle between the trees
-        const xPos = (startPos.z + endPos.z) / 2;
-
-        // Create the line between two trees
-        const line = MeshBuilder.CreateLines("line" + i, { points: [startPos, endPos] }, scene);
-
-        // Set the position of the line
-        line.position = new Vector3(xPos+40, 0.1, 0); // Adjust the Y position as needed
-
-        // Customize the appearance of the line here, such as color or material
-        // For example:
-        // line.color = new Color3(1, 1, 1); // White color
-    }
-};*/
-
-const createRunningTrack = function(scene) {
-    // Define the positions of the trees along the Z-axis
-    const treePositions = [
-        -400, -200, -100, -50, 0, 50, 100, 200, 400 // Adjust these values based on your scene
-    ];
-
-    // Create lines between the trees
-    for (let i = 0; i < treePositions.length - 1; i++) {
-        const startPos = new Vector3(treePositions[i], 0, -300); // Start position of the line, extended along the Z-axis
-        const endPos = new Vector3(treePositions[i + 1], 0, 300); // End position of the line, extended along the Z-axis
-
-        // Calculate the X position for the line to be in the middle between the trees
-        const xPos = (startPos.x + endPos.x) / 2;
-
-        // Create the line between two trees
-        const line = MeshBuilder.CreateLines("line" + i, { points: [startPos, endPos] }, scene);
-
-        // Set the position of the line
-        line.position = new Vector3(xPos + 200, 0.1, 0); // Adjust the Y position as needed
-
-        // Customize the appearance of the line here, such as color or material
-        // For example:
-        // line.color = new Color3(1, 1, 1); // White color
-    }
-};
-
-// Call the function to create the running track
-createRunningTrack(scene); // Assuming `scene` is already defined in your code
-
-
-
 
 
     //////////////////////////////////////////
@@ -425,10 +380,10 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers,quizBo
     
         const ground = MeshBuilder.CreateGround("ground", { width: 6000, height: 10000 }, scene);
 
-        const grassTexture = new Texture("img/grass.jpg", scene);
+        const betonTexture = new Texture("img/beton.JPG", scene);
         const groundMaterial = new StandardMaterial("groundMaterial", scene);
-        //groundMaterial.diffuseTexture = grassTexture;
-        groundMaterial.diffuseColor  = new Color3(0.7, 0.2, 0.1);
+        groundMaterial.diffuseTexture = betonTexture;
+        //groundMaterial.diffuseColor  = new Color3(0.7, 0.2, 0.1);
         ground.material = groundMaterial; // Assign the grass material to the ground
         ground.checkCollisions = true;
 
@@ -544,9 +499,17 @@ let clonedMeshes = [];
 SceneLoader.ImportMesh("", "models/toureff.glb", "", scene, function (newMeshes) {
     const tower = newMeshes[0]; // Assuming there's only one mesh in the imported model
     // Adjust the position of the tower
-    tower.position = new Vector3(150, 0, 800); // Adjust the Z position to place it further than the trees
+    tower.position = new Vector3(150, 10, 800); // Adjust the Z position to place it further than the trees
     // Make the tower large
     tower.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
+});
+
+SceneLoader.ImportMesh("", "models/question.fbx", "", scene, function (newMeshes) {
+    const question = newMeshes[0]; // Assuming there's only one mesh in the imported model
+    // Adjust the position of the tower
+    question.position = new Vector3(140, 0, 300); // Adjust the Z position to place it further than the trees
+    // Make the tower large
+    question.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
 });
 
 
