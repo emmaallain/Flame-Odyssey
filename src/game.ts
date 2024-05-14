@@ -5,11 +5,14 @@ import { FireMaterial } from '@babylonjs/materials';
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { AdvancedDynamicTexture,TextBlock , Button} from "@babylonjs/gui";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+
 import { SkyMaterial } from '@babylonjs/materials';
 
 import App from "./app";
 
+
+
+let userClick=false;
 export const QuickTreeGenerator = function(sizeBranch, sizeTrunk, radius, trunkMaterial, leafMaterial, scene) {
 
     const tree : Mesh = new Mesh("tree", scene);
@@ -436,6 +439,7 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers,quizBo
                     
                         character.position = new Vector3(9, 0, -300);     
                     }
+                    setUserClick(false);
                     // if instersects with mesh
                     // TODO : deduct points en fonction de l'objet
                     for (let i=0; i<meshes.length; i++){
@@ -470,17 +474,12 @@ const addCharacterWithMouvement = function(scene, meshes, seeds, barriers,quizBo
                         }  
 
                         for(let j=0; j<quizBoxes.length ; j++){
-                            if (quizBoxes[j].intersectsMesh(character, false)) {
-                                                               
-                                camera.detachControl();
-                                scene.animationGroups.forEach((animationGroup) => {
-                                    animationGroup.pause();
-                                });
-                                scene.meshes.forEach((mesh) => {
-                                    mesh.freezeWorldMatrix();
-                                });
-                                                   //
+                            if (quizBoxes[j].intersectsMesh(character, false)) {                      
+                                scene.collisionsEnabled=false;
                                 displayQuiz();
+                                if (userClick) {
+                                    scene.collisionsEnabled = true;
+                                }
                                 quizBoxes[j].isVisible = false;
                                 quizBoxes.splice(j,1);
                                 
@@ -502,6 +501,14 @@ SceneLoader.ImportMesh("", "models/toureff.glb", "", scene, function (newMeshes)
     tower.position = new Vector3(150, 10, 800); // Adjust the Z position to place it further than the trees
     // Make the tower large
     tower.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
+});
+
+SceneLoader.ImportMesh("", "models/louvre.glb", "", scene, function (newMeshes) {
+    const louvre = newMeshes[0]; // Assuming there's only one mesh in the imported model
+    // Adjust the position of the tower
+    louvre.position = new Vector3(150, 0, 1000); // Adjust the Z position to place it further than the trees
+    // Make the tower large
+    louvre.scaling = new Vector3(40, 40, 40); // Adjust the scaling factor as needed
 });
 
 SceneLoader.ImportMesh("", "models/question.fbx", "", scene, function (newMeshes) {
@@ -625,6 +632,9 @@ async function displayQuiz() {
 
 
 }
+function setUserClick(boolean){
+    userClick=boolean;
+}
 
 function sentMessage(boolean,reponseCorrecte,message,advancedTexture){
     if(message instanceof TextBlock){
@@ -636,6 +646,7 @@ function sentMessage(boolean,reponseCorrecte,message,advancedTexture){
             setTimeout(() => {
                 message.isVisible = false;
                 advancedTexture.dispose();
+                
             }, 7000);
         }else{
             message.text="Raté! La bonne réponse était "+ reponseCorrecte + ". Vous perdez 3 points.";
@@ -646,6 +657,7 @@ function sentMessage(boolean,reponseCorrecte,message,advancedTexture){
                 advancedTexture.dispose();
             }, 7000);
         }
+        setUserClick(true);
     }
     
 
