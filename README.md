@@ -11,4 +11,6 @@ To run the project locally, please follow these steps:
 
 The game will then be available by following this link: http://localhost:8080/
 
+(not hosted)
+
 Have fun! 
